@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - ToolMitra{% endblock %}
+
+{% block content %}
+<h2 class="text-center fw-bold mb-4">🧰 ToolMitra - Document Toolkit</h2>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+    <!-- PDF Tools -->
+    <div class="col stiky-top">
+        <div class="card border-primary shadow-sm h-100">
+            <div class="card-header bg-primary text-white fw-semibold">
+                📄 PDF Tools
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li><a href="/pdf-text-extractor/" class="text-decoration-none">📝 PDF Text Extractor</a></li>
+                    <li><a href="/pdf-merger/" class="text-decoration-none">🔗 PDF Merge</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Word Tools -->
+    <div class="col">
+        <div class="card border-success shadow-sm h-100">
+            <div class="card-header bg-success text-white fw-semibold">
+                📝 Word Tools
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li><a href="/pdf-to-word/" class="text-decoration-none">📤 PDF to Word</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Excel Tools -->
+    <div class="col">
+        <div class="card border-warning shadow-sm h-100">
+            <div class="card-header bg-warning text-dark fw-semibold">
+                📊 Excel Tools
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li><a href="/pdf-to-excel/" class="text-decoration-none">📈 PDF to Excel (Coming Soon)</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- PPT Tools -->
+    <div class="col">
+        <div class="card border-danger shadow-sm h-100">
+            <div class="card-header bg-danger text-white fw-semibold">
+                📽️ PPT Tools
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li><a href="#" class="text-decoration-none">📽️ PDF to PPT (Coming Soon)</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image & OCR Tools -->
+    <div class="col">
+        <div class="card border-dark shadow-sm h-100">
+            <div class="card-header bg-dark text-white fw-semibold">
+                🖼️ Image & OCR Tools
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li><a href="#" class="text-decoration-none">🧠 Image to Text (Coming Soon)</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

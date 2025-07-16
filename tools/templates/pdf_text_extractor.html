@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}PDF Text Extractor - ToolMitra{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+  <h3 class="text-center mb-4">📝 PDF Text Extractor</h3>
+
+  <!-- Upload Form -->
+  <form method="POST" enctype="multipart/form-data" class="mb-4">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="pdf_file" class="form-label">Choose a PDF File:</label>
+      <input type="file" class="form-control" name="pdf_file" id="pdf_file" accept=".pdf" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Extract Text</button>
+  </form>
+
+  <!-- Output Section -->
+  {% if extracted_text %}
+  <div class="card">
+    <div class="card-header bg-success text-white fw-semibold">
+      Extracted Text
+    </div>
+    <div class="card-body">
+      <textarea class="form-control" rows="15" readonly>{{ extracted_text }}</textarea>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

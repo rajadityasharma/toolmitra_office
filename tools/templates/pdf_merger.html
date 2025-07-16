@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}PDF Merger - ToolMitra{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+  <h3 class="text-center mb-4">🔗 PDF Merger</h3>
+
+  <form method="POST" enctype="multipart/form-data" id="mergeForm">
+    {% csrf_token %}
+    <div id="fileInputs">
+      <div class="mb-3">
+        <label class="form-label">Select PDF File:</label>
+        <input type="file" name="pdf_files" accept=".pdf" class="form-control" required>
+      </div>
+    </div>
+
+    <button type="button" class="btn btn-outline-primary mb-3" onclick="addFileInput()">➕ Add More PDFs</button>
+    <br>
+    <button type="submit" class="btn btn-success">Merge PDFs</button>
+  </form>
+</div>
+
+<script>
+  function addFileInput() {
+    const container = document.getElementById('fileInputs');
+    const newInput = document.createElement('div');
+    newInput.classList.add('mb-3');
+    newInput.innerHTML = `
+      <input type="file" name="pdf_files" accept=".pdf" class="form-control" required>
+    `;
+    container.appendChild(newInput);
+  }
+</script>
+{% endblock %}

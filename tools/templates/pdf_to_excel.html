@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}PDF to Excel - ToolMitra{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+  <h3 class="text-center mb-4">📈 PDF to Excel Converter</h3>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="pdf_file" class="form-label">Select PDF File:</label>
+      <input type="file" name="pdf_file" id="pdf_file" class="form-control" accept=".pdf" required>
+    </div>
+    <button type="submit" class="btn btn-success">Convert to Excel</button>
+  </form>
+
+  {% if converted %}
+  <div class="alert alert-success mt-4">
+    ✅ Excel generated! <a href="{{ excel_file_url }}" class="btn btn-sm btn-outline-success" download>Download Excel</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
