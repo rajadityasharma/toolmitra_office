@@ -9,4 +9,5 @@ urlpatterns = [
     path('pdf-merger/', views.pdf_merger, name='pdf_merger'),
     path('pdf-to-word/', views.pdf_to_word, name='pdf_to_word'),
     path('pdf-to-excel/', views.pdf_to_excel, name='pdf_to_excel'),
+    path('pdf-to-ppt/', views.pdf_to_ppt, name='pdf_to_ppt'),
 ]

@@ -4,11 +4,17 @@ from django.http import HttpResponse
 from PyPDF2 import PdfMerger
 from pdf2docx import Converter
 import os
-from django.core.files.storage import default_storage
+from django.core.files.storage import default_storage, FileSystemStorage
 from django.conf import settings
 import pdfplumber
 import pandas as pd
-from django.core.files.storage import FileSystemStorage
+import uuid
+from pathlib import Path
+from openpyxl import Workbook
+import tempfile
+from pdf2image import convert_from_bytes
+from pptx import Presentation
+from pptx.util import Inches
 
 def dashboard(request):
     return render(request, "dashboard.html")
@@ -64,35 +70,76 @@ def pdf_to_word(request):
 
 
 def pdf_to_excel(request):
-    converted = False
-    excel_file_url = None
+    excel_url = None
 
     if request.method == 'POST' and request.FILES.get('pdf_file'):
         pdf_file = request.FILES['pdf_file']
+        unique_id = str(uuid.uuid4())
+        pdf_path = Path(settings.MEDIA_ROOT) / f"{unique_id}.pdf"
+        
+        with open(pdf_path, 'wb+') as f:
+            for chunk in pdf_file.chunks():
+                f.write(chunk)
 
-        # ✅ Save file inside media/temp
-        fs = FileSystemStorage(location=settings.MEDIA_ROOT / 'temp', base_url=settings.MEDIA_URL + 'temp/')
-        filename = fs.save(pdf_file.name, pdf_file)
-        pdf_full_path = fs.path(filename)
+        # Start converting PDF to Excel
+        wb = Workbook()
+        ws = wb.active
 
-        all_tables = []
-
-        with pdfplumber.open(pdf_full_path) as pdf:
+        with pdfplumber.open(pdf_path) as pdf:
+            row_num = 1
             for page in pdf.pages:
-                table = page.extract_table()
-                if table:
-                    df = pd.DataFrame(table[1:], columns=table[0])
-                    all_tables.append(df)
+                text = page.extract_text()
+                if text:
+                    for line in text.split('\n'):
+                        ws.cell(row=row_num, column=1).value = line
+                        row_num += 1
 
-        if all_tables:
-            combined_df = pd.concat(all_tables, ignore_index=True)
-            excel_path = pdf_full_path.replace('.pdf', '.xlsx')
-            combined_df.to_excel(excel_path, index=False)
+        # Save the Excel file
+        excel_filename = f"{unique_id}.xlsx"
+        excel_path = Path(settings.MEDIA_ROOT) / excel_filename
+        wb.save(excel_path)
+        excel_url = settings.MEDIA_URL + excel_filename
 
-            excel_file_url = fs.base_url + os.path.basename(excel_path)
-            converted = True
+    return render(request, 'pdf_to_excel.html', {'excel_url': excel_url})
 
-    return render(request, 'pdf_to_excel.html', {
-        'converted': converted,
-        'excel_file_url': excel_file_url
-    })
+
+def pdf_to_ppt(request):
+    if request.method == 'POST' and request.FILES.get('pdf_file'):
+        pdf_file = request.FILES['pdf_file']
+        
+        # Convert PDF to images
+        images = convert_from_bytes(pdf_file.read(), poppler_path="C:/poppler-xx/bin")
+
+        # Create presentation
+        prs = Presentation()
+        blank_slide_layout = prs.slide_layouts[6]  # blank layout
+
+        for img in images:
+            slide = prs.slides.add_slide(blank_slide_layout)
+
+            # Save temp image
+            with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+                img_path = tmp.name
+                img.save(img_path, 'PNG')
+
+            # Slide size
+            prs_width = prs.slide_width
+            prs_height = prs.slide_height
+
+            # Add image to slide
+            slide.shapes.add_picture(img_path, 0, 0, width=prs_width, height=prs_height)
+
+            # Clean up temp image
+            os.remove(img_path)
+
+        # Save PPT to memory
+        with tempfile.NamedTemporaryFile(suffix='.pptx', delete=False) as tmp_ppt:
+            prs.save(tmp_ppt.name)
+            tmp_ppt.seek(0)
+            pptx_data = tmp_ppt.read()
+
+        response = HttpResponse(pptx_data, content_type='application/vnd.openxmlformats-officedocument.presentationml.presentation')
+        response['Content-Disposition'] = 'attachment; filename="converted.pptx"'
+        return response
+
+    return render(request, 'pdf_to_ppt.html')
